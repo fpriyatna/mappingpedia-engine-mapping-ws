@@ -37,7 +37,7 @@ public class MappingsWSController {
     //private OntModel ontModel = MappingPediaEngine.ontologyModel();
 
 
-    private MappingDocumentController mappingDocumentController = new MappingDocumentController();
+    private MappingDocumentController mappingDocumentController = MappingDocumentController.apply();
 
     @RequestMapping(value="/greeting", method= RequestMethod.GET)
     public GreetingJava getGreeting(@RequestParam(value="name", defaultValue="World") String name) {
