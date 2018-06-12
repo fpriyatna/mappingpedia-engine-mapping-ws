@@ -9,6 +9,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.annotation.MultipartConfig;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
 import es.upm.fi.dia.oeg.mappingpedia.controller.MappingDocumentController;
 import es.upm.fi.dia.oeg.mappingpedia.model.*;
 import es.upm.fi.dia.oeg.mappingpedia.model.result.*;
@@ -395,7 +398,6 @@ public class MappingsWSController {
         }
     }*/
 
-/*
     @RequestMapping(value = "/mappings/{organization_id}", method= RequestMethod.POST)
     public AddMappingDocumentResult postMappings2(
             @PathVariable("organization_id") String organizationID
@@ -429,10 +431,32 @@ public class MappingsWSController {
         logger.info("mapping_document_file = " + mappingDocumentFileMultipartFile);
         logger.info("mapping_document_download_url = " + pMappingDocumentDownloadURL1);
 
+
         try {
+            //FIND A DATASET IF DATASET ID IS NOT PROVIDED
+            String datasetId;
+            if(pDatasetID != null) {
+                datasetId = pDatasetID;
+            } else {
+                String datasetsServerUrl = MPCConstants.ENGINE_DATASETS_SERVER() + "datasets";
+                if(ckanPackageId != null && ckanPackageName == null) {
+                    datasetsServerUrl += "?ckan_package_id=" + ckanPackageId;
+                } else if(ckanPackageName != null && ckanPackageId  == null) {
+                    datasetsServerUrl += "?ckan_package_name=" + ckanPackageName;
+                }
+
+                logger.info("datasetsServerUrl = " + datasetsServerUrl);
+                HttpResponse<JsonNode> jsonResponse = Unirest.get(datasetsServerUrl)
+                        .asJson();
+                datasetId = jsonResponse.getBody().getObject().getJSONArray("results").getJSONObject(0).getString("id");
+            }
+            logger.info("datasetId = " + datasetId);
+
+            /*
             Dataset dataset = this.datasetController.findOrCreate(
                     organizationID, pDatasetID, ckanPackageId, ckanPackageName);
             String datasetId = dataset.dctIdentifier();
+            */
 
             return this.postMappings1(organizationID
                     , datasetId, ckanPackageId, ckanPackageName
@@ -452,7 +476,6 @@ public class MappingsWSController {
             );
         }
     }
-*/
 
 
     @RequestMapping(value = "/mappings/{organization_id}/{dataset_id}", method= RequestMethod.POST)
