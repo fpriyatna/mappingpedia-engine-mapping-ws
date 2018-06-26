@@ -1,8 +1,5 @@
 package es.upm.fi.dia.oeg.mappingpedia;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 //import org.apache.jena.ontology.OntModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,17 +8,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.MultipartProperties;
 
-import es.upm.fi.dia.oeg.mappingpedia.utility.CKANUtility;
-import es.upm.fi.dia.oeg.mappingpedia.utility.GitHubUtility;
-import es.upm.fi.dia.oeg.mappingpedia.utility.JenaClient;
-import es.upm.fi.dia.oeg.mappingpedia.utility.VirtuosoClient;
-
 @SpringBootApplication
-public class Application {
+public class MappingsApplication {
 
 
 	public static void main(String[] args) {
-		Logger logger = LoggerFactory.getLogger("Application");
+		Logger logger = LoggerFactory.getLogger("MappingsApplication");
 		logger.info("Working Directory = " + System.getProperty("user.dir"));
 		logger.info("Starting Mappingpedia Engine Mappings WS version 1.0.0 ...");
 
@@ -31,7 +23,7 @@ public class Application {
 		try {
 
 			logger.info("Loading configuration file ...");
-			is = Application.class.getClassLoader().getResourceAsStream(configurationFilename);
+			is = MappingsApplication.class.getClassLoader().getResourceAsStream(configurationFilename);
 			if(is==null){
 				logger.error("Sorry, unable to find " + configurationFilename);
 				return;
@@ -53,7 +45,7 @@ public class Application {
 		}
 		*/
 
-		SpringApplication.run(Application.class, args);
+		SpringApplication.run(MappingsApplication.class, args);
 		MultipartProperties multipartProperties = new MultipartProperties();
 		multipartProperties.setLocation("./mpe-mappings-temp");
 		String multiPartPropertiesLocation = multipartProperties.getLocation();
