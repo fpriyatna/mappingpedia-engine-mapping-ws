@@ -9,11 +9,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.MultipartProperties;
 
 @SpringBootApplication
-public class MappingsApplication {
+public class Application {
 
 
 	public static void main(String[] args) {
-		Logger logger = LoggerFactory.getLogger("MappingsApplication");
+		Logger logger = LoggerFactory.getLogger("Application");
 		logger.info("Working Directory = " + System.getProperty("user.dir"));
 		logger.info("Starting Mappingpedia Engine Mappings WS version 1.0.0 ...");
 
@@ -23,7 +23,7 @@ public class MappingsApplication {
 		try {
 
 			logger.info("Loading configuration file ...");
-			is = MappingsApplication.class.getClassLoader().getResourceAsStream(configurationFilename);
+			is = Application.class.getClassLoader().getResourceAsStream(configurationFilename);
 			if(is==null){
 				logger.error("Sorry, unable to find " + configurationFilename);
 				return;
@@ -45,7 +45,7 @@ public class MappingsApplication {
 		}
 		*/
 
-		SpringApplication.run(MappingsApplication.class, args);
+		SpringApplication.run(Application.class, args);
 		MultipartProperties multipartProperties = new MultipartProperties();
 		multipartProperties.setLocation("./mpe-mappings-temp");
 		String multiPartPropertiesLocation = multipartProperties.getLocation();
