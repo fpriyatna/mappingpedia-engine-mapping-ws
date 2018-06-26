@@ -17,7 +17,6 @@ import es.upm.fi.dia.oeg.mappingpedia.model.*;
 import es.upm.fi.dia.oeg.mappingpedia.model.result.*;
 import es.upm.fi.dia.oeg.mappingpedia.utility.*;
 import org.apache.commons.io.FileUtils;
-//import org.apache.jena.ontology.OntModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,12 +41,14 @@ public class MappingsWSController {
 
     private MappingDocumentController mappingDocumentController = MappingDocumentController.apply();
 
+    /*
     @RequestMapping(value="/greeting", method= RequestMethod.GET)
     public GreetingJava getGreeting(@RequestParam(value="name", defaultValue="World") String name) {
         logger.info("/greeting(GET) ...");
         return new GreetingJava(counter.incrementAndGet(),
                 String.format(template, name));
     }
+    */
 
     @RequestMapping(value="/", method= RequestMethod.GET, produces={"application/ld+json"})
     public Inbox get() {
@@ -197,25 +198,27 @@ public class MappingsWSController {
 
     @RequestMapping(value="/mappings", method= RequestMethod.GET)
     public ListResult getMappings(
-            @RequestParam(value="dataset_id", defaultValue = "", required = false) String datasetId
+            @RequestParam(value="id", defaultValue = "", required = false) String mdId
+            , @RequestParam(value="dataset_id", defaultValue = "", required = false) String datasetId
             , @RequestParam(value="ckan_package_id", defaultValue = "", required = false) String ckanPackageId
             , @RequestParam(value="ckan_package_name", defaultValue = "", required = false) String ckanPackageName
             , @RequestParam(value="distribution_id", defaultValue = "", required = false) String distributionId
     ) {
         logger.info("GET /mappings");
+        logger.info("id = " + mdId);
         logger.info("dataset_id = " + datasetId);
         logger.info("ckan_package_id = " + ckanPackageId);
         logger.info("ckan_package_name = " + ckanPackageName);
         logger.info("distribution_id = " + distributionId);
 
-        ListResult listResult = null;
+        ListResult<MappingDocument> listResult = null;
 
-        if(!"".equals(datasetId.trim())) {
-            listResult = this.mappingDocumentController.findByDatasetId(
-                    datasetId, ckanPackageId, ckanPackageName);
+        if(!"".equals(mdId.trim())) {
+            listResult = this.mappingDocumentController.findById(mdId);
+        } else if(!"".equals(datasetId.trim())) {
+            listResult = this.mappingDocumentController.findByDatasetId(datasetId, ckanPackageId, ckanPackageName);
         } else if(!"".equals(ckanPackageId.trim())) {
-            listResult = this.mappingDocumentController.findByCKANPackageId(
-                    ckanPackageId);
+            listResult = this.mappingDocumentController.findByCKANPackageId(ckanPackageId);
         } else if(!"".equalsIgnoreCase(distributionId.trim())) {
             listResult = this.mappingDocumentController.findByDistributionId(distributionId);
         } else {
@@ -448,7 +451,13 @@ public class MappingsWSController {
                 logger.info("datasetsServerUrl = " + datasetsServerUrl);
                 HttpResponse<JsonNode> jsonResponse = Unirest.get(datasetsServerUrl)
                         .asJson();
-                datasetId = jsonResponse.getBody().getObject().getJSONArray("results").getJSONObject(0).getString("id");
+                int responseStatus = jsonResponse.getStatus();
+                if(responseStatus >= 200 && responseStatus < 300) {
+                    datasetId = jsonResponse.getBody().getObject().getJSONArray("results").getJSONObject(0).getString("id");
+                } else {
+                    datasetId = null;
+                }
+
             }
             logger.info("datasetId = " + datasetId);
 
