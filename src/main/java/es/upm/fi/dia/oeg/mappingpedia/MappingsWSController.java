@@ -3,8 +3,6 @@ package es.upm.fi.dia.oeg.mappingpedia;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.annotation.MultipartConfig;
@@ -404,7 +402,7 @@ public class MappingsWSController {
     }*/
 
     @RequestMapping(value = "/mappings/{organization_id}", method= RequestMethod.POST)
-    public AddMappingDocumentResult postMappings2(
+    public AddMappingDocumentResult postMappingsWithoutDataset(
             @PathVariable("organization_id") String organizationID
 
             , @RequestParam(value="dataset_id", required = false) String pDatasetID
@@ -469,7 +467,7 @@ public class MappingsWSController {
             String datasetId = dataset.dctIdentifier();
             */
 
-            return this.postMappings1(organizationID
+            return this.postMappingsWithDataset(organizationID
                     , datasetId, ckanPackageId, ckanPackageName
                     , manifestFileRef
                     , mappingFileMultipartFile, mappingDocumentFileMultipartFile, pMappingDocumentDownloadURL1, pMappingDocumentDownloadURL2
@@ -490,7 +488,7 @@ public class MappingsWSController {
 
 
     @RequestMapping(value = "/mappings/{organization_id}/{dataset_id}", method= RequestMethod.POST)
-    public AddMappingDocumentResult postMappings1(
+    public AddMappingDocumentResult postMappingsWithDataset(
             @PathVariable("organization_id") String organizationID
 
             , @PathVariable("dataset_id") String datasetID
@@ -516,6 +514,8 @@ public class MappingsWSController {
     )
     {
         logger.info("[POST] /mappings/{organization_id}/{dataset_id}");
+        logger.info("mapping_document_download_url = " + pMappingDocumentDownloadURL1);
+        logger.info("mappingDocumentDownloadURL = " + pMappingDocumentDownloadURL2);
         logger.info("organization_id = " + organizationID);
         logger.info("dataset_id = " + datasetID);
         logger.info("ckan_package_id = " + ckanPackageId);
