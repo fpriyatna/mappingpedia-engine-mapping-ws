@@ -3,8 +3,6 @@ package es.upm.fi.dia.oeg.mappingpedia;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.annotation.MultipartConfig;
@@ -15,7 +13,9 @@ import com.mashape.unirest.http.Unirest;
 import es.upm.fi.dia.oeg.mappingpedia.controller.MappingDocumentController;
 import es.upm.fi.dia.oeg.mappingpedia.model.*;
 import es.upm.fi.dia.oeg.mappingpedia.model.result.*;
-import es.upm.fi.dia.oeg.mappingpedia.utility.*;
+//import es.upm.fi.dia.oeg.mappingpedia.utility.*;
+import es.upm.fi.dia.oeg.mappingpedia.utility.MpcCkanUtility;
+import es.upm.fi.dia.oeg.mappingpedia.utility.MpcUtility;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -114,7 +114,7 @@ public class MappingsWSController {
             catalogUrl = MappingPediaEngine.mappingpediaProperties().ckanURL();
         }
         logger.info("GET /ckanDatasetList ...");
-        return CKANUtility.getDatasetList(catalogUrl);
+        return MpcCkanUtility.getDatasetList(catalogUrl);
     }
 
     @RequestMapping(value="/virtuoso_enabled", method= RequestMethod.GET)
@@ -158,7 +158,7 @@ public class MappingsWSController {
         String ckanURL = MappingPediaEngine.mappingpediaProperties().ckanURL();
         String ckanKey = MappingPediaEngine.mappingpediaProperties().ckanKey();
 
-        CKANUtility ckanClient = new CKANUtility(ckanURL, ckanKey);
+        MpcCkanUtility ckanClient = new MpcCkanUtility(ckanURL, ckanKey);
         File file = new File(filePath);
         try {
             if(!file.exists()) {
@@ -183,7 +183,7 @@ public class MappingsWSController {
         String ckanURL = MappingPediaEngine.mappingpediaProperties().ckanURL();
         String ckanKey = MappingPediaEngine.mappingpediaProperties().ckanKey();
 
-        CKANUtility ckanClient = new CKANUtility(ckanURL, ckanKey);
+        MpcCkanUtility ckanClient = new MpcCkanUtility(ckanURL, ckanKey);
         return ckanClient.updateDatasetLanguage(organizationId, datasetLanguage);
     }
 
@@ -402,7 +402,7 @@ public class MappingsWSController {
     }*/
 
     @RequestMapping(value = "/mappings/{organization_id}", method= RequestMethod.POST)
-    public AddMappingDocumentResult postMappings2(
+    public AddMappingDocumentResult postMappingsWithoutDataset(
             @PathVariable("organization_id") String organizationID
 
             , @RequestParam(value="dataset_id", required = false) String pDatasetID
@@ -467,7 +467,7 @@ public class MappingsWSController {
             String datasetId = dataset.dctIdentifier();
             */
 
-            return this.postMappings1(organizationID
+            return this.postMappingsWithDataset(organizationID
                     , datasetId, ckanPackageId, ckanPackageName
                     , manifestFileRef
                     , mappingFileMultipartFile, mappingDocumentFileMultipartFile, pMappingDocumentDownloadURL1, pMappingDocumentDownloadURL2
@@ -488,7 +488,7 @@ public class MappingsWSController {
 
 
     @RequestMapping(value = "/mappings/{organization_id}/{dataset_id}", method= RequestMethod.POST)
-    public AddMappingDocumentResult postMappings1(
+    public AddMappingDocumentResult postMappingsWithDataset(
             @PathVariable("organization_id") String organizationID
 
             , @PathVariable("dataset_id") String datasetID
@@ -514,6 +514,8 @@ public class MappingsWSController {
     )
     {
         logger.info("[POST] /mappings/{organization_id}/{dataset_id}");
+        logger.info("mapping_document_download_url = " + pMappingDocumentDownloadURL1);
+        logger.info("mappingDocumentDownloadURL = " + pMappingDocumentDownloadURL2);
         logger.info("organization_id = " + organizationID);
         logger.info("dataset_id = " + datasetID);
         logger.info("ckan_package_id = " + ckanPackageId);
@@ -521,7 +523,7 @@ public class MappingsWSController {
         logger.info("mapping_language = " + pMappingLanguage1);
         logger.info("mappingLanguage = " + pMappingLanguage2);
         try {
-            boolean generateManifestFile = MappingPediaUtility.stringToBoolean(pGenerateManifestFile);
+            boolean generateManifestFile = MpcUtility.stringToBoolean(pGenerateManifestFile);
             File manifestFile = MpcUtility.multipartFileToFile(manifestFileRef, datasetID);
 
             MappingDocument mappingDocument = new MappingDocument();
