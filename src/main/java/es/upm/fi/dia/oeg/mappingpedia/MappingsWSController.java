@@ -15,7 +15,9 @@ import com.mashape.unirest.http.Unirest;
 import es.upm.fi.dia.oeg.mappingpedia.controller.MappingDocumentController;
 import es.upm.fi.dia.oeg.mappingpedia.model.*;
 import es.upm.fi.dia.oeg.mappingpedia.model.result.*;
-import es.upm.fi.dia.oeg.mappingpedia.utility.*;
+//import es.upm.fi.dia.oeg.mappingpedia.utility.*;
+import es.upm.fi.dia.oeg.mappingpedia.utility.MpcCkanUtility;
+import es.upm.fi.dia.oeg.mappingpedia.utility.MpcUtility;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -114,7 +116,7 @@ public class MappingsWSController {
             catalogUrl = MappingPediaEngine.mappingpediaProperties().ckanURL();
         }
         logger.info("GET /ckanDatasetList ...");
-        return CKANUtility.getDatasetList(catalogUrl);
+        return MpcCkanUtility.getDatasetList(catalogUrl);
     }
 
     @RequestMapping(value="/virtuoso_enabled", method= RequestMethod.GET)
@@ -158,7 +160,7 @@ public class MappingsWSController {
         String ckanURL = MappingPediaEngine.mappingpediaProperties().ckanURL();
         String ckanKey = MappingPediaEngine.mappingpediaProperties().ckanKey();
 
-        CKANUtility ckanClient = new CKANUtility(ckanURL, ckanKey);
+        MpcCkanUtility ckanClient = new MpcCkanUtility(ckanURL, ckanKey);
         File file = new File(filePath);
         try {
             if(!file.exists()) {
@@ -183,7 +185,7 @@ public class MappingsWSController {
         String ckanURL = MappingPediaEngine.mappingpediaProperties().ckanURL();
         String ckanKey = MappingPediaEngine.mappingpediaProperties().ckanKey();
 
-        CKANUtility ckanClient = new CKANUtility(ckanURL, ckanKey);
+        MpcCkanUtility ckanClient = new MpcCkanUtility(ckanURL, ckanKey);
         return ckanClient.updateDatasetLanguage(organizationId, datasetLanguage);
     }
 
@@ -521,7 +523,7 @@ public class MappingsWSController {
         logger.info("mapping_language = " + pMappingLanguage1);
         logger.info("mappingLanguage = " + pMappingLanguage2);
         try {
-            boolean generateManifestFile = MappingPediaUtility.stringToBoolean(pGenerateManifestFile);
+            boolean generateManifestFile = MpcUtility.stringToBoolean(pGenerateManifestFile);
             File manifestFile = MpcUtility.multipartFileToFile(manifestFileRef, datasetID);
 
             MappingDocument mappingDocument = new MappingDocument();
