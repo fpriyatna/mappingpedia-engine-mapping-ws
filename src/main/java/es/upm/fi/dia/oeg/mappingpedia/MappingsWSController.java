@@ -214,15 +214,20 @@ public class MappingsWSController {
         ListResult<MappingDocument> listResult = null;
 
         if(!"".equals(mdId.trim())) {
+            logger.info("find mappings by id");
             listResult = this.mappingDocumentController.findById(mdId);
         } else if(!"".equals(datasetId.trim())) {
+            logger.info("find mappings by dataset id");
             listResult = this.mappingDocumentController.findByDatasetId(datasetId, ckanPackageId, ckanPackageName);
         } else if(!"".equals(ckanPackageId.trim())) {
+            logger.info("find mappings by ckan package id");
             listResult = this.mappingDocumentController.findByCKANPackageId(ckanPackageId);
         } else if(!"".equalsIgnoreCase(distributionId.trim())) {
+            logger.info("find mappings by distribution id");
             listResult = this.mappingDocumentController.findByDistributionId(distributionId);
         } else {
-
+            logger.info("find all mappings");
+            listResult = this.mappingDocumentController.findAll();
         }
 
         return listResult;
