@@ -203,6 +203,7 @@ public class MappingsWSController {
             , @RequestParam(value="ckan_package_id", defaultValue = "", required = false) String ckanPackageId
             , @RequestParam(value="ckan_package_name", defaultValue = "", required = false) String ckanPackageName
             , @RequestParam(value="distribution_id", defaultValue = "", required = false) String distributionId
+            , @RequestParam(value="with_duplicates", defaultValue = "false") String pWithDuplicates
     ) {
         logger.info("GET /mappings");
         logger.info("id = " + mdId);
@@ -210,6 +211,13 @@ public class MappingsWSController {
         logger.info("ckan_package_id = " + ckanPackageId);
         logger.info("ckan_package_name = " + ckanPackageName);
         logger.info("distribution_id = " + distributionId);
+        logger.info("with_duplicates = " + pWithDuplicates);
+
+        boolean withDuplicates = false;
+        if(pWithDuplicates != null) {
+            withDuplicates = MpcUtility.stringToBoolean(pWithDuplicates);
+        }
+        logger.info("withDuplicates = " + withDuplicates);
 
         ListResult<MappingDocument> listResult = null;
 
@@ -227,7 +235,7 @@ public class MappingsWSController {
             listResult = this.mappingDocumentController.findByDistributionId(distributionId);
         } else {
             logger.info("find all mappings");
-            listResult = this.mappingDocumentController.findAll();
+            listResult = this.mappingDocumentController.findAll(withDuplicates);
         }
 
         return listResult;
